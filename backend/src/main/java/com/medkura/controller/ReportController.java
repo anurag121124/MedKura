@@ -1,5 +1,6 @@
 package com.medkura.controller;
 
+import com.medkura.dto.GenerateSummaryRequest;
 import com.medkura.dto.ReportCreateResponse;
 import com.medkura.dto.ReportDetailResponse;
 import com.medkura.dto.ReportListItem;
@@ -62,5 +63,14 @@ public class ReportController {
       @PathVariable Long id,
       @Valid @RequestBody ReportStatusUpdateRequest request) {
     return reportService.updateStatus(authentication.getName(), id, request.getStatus(), request.getSummary());
+  }
+
+  @PostMapping("/{id}/summary")
+  public ReportDetailResponse generateSummary(
+      Authentication authentication,
+      @PathVariable Long id,
+      @RequestBody(required = false) GenerateSummaryRequest request) {
+    String notes = request == null ? null : request.getNotes();
+    return reportService.generateSummary(authentication.getName(), id, notes);
   }
 }

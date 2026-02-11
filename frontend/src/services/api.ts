@@ -6,6 +6,7 @@ export const api = {
   reports: {
     root: "/api/reports",
     detail: (id: string) => `/api/reports/${id}`,
-    status: (id: string) => `/api/reports/${id}/status`
+    status: (id: string) => `/api/reports/${id}/status`,
+    summary: (id: string) => `/api/reports/${id}/summary`
   }
 };

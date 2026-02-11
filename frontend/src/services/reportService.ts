@@ -28,6 +28,10 @@ export type StatusUpdatePayload = {
   summary?: string;
 };
 
+export type SummaryGeneratePayload = {
+  notes?: string;
+};
+
 export function fetchReports() {
   return get<ReportListItem[]>(api.reports.root);
 }
@@ -38,6 +42,10 @@ export function fetchReport(id: string) {
 
 export function updateReportStatus(id: string, payload: StatusUpdatePayload) {
   return patch<ReportDetail>(api.reports.status(id), JSON.stringify(payload));
+}
+
+export function generateReportSummary(id: string, payload?: SummaryGeneratePayload) {
+  return post<ReportDetail>(api.reports.summary(id), JSON.stringify(payload || {}));
 }
 
 export function uploadReport(formData: FormData) {

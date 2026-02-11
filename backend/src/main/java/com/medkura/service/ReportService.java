@@ -129,16 +129,37 @@ public class ReportService {
       report.setSummary(summary);
     } else if (nextStatus == ReportStatus.COMPLETED
         && (report.getSummary() == null || report.getSummary().isBlank())) {
-      report.setSummary(generateSummary(report));
+      report.setSummary(generateSummary(report, null));
     }
     reportRepository.save(report);
 
     return getReport(userEmail, id);
   }
 
-  private String generateSummary(Report report) {
+  public ReportDetailResponse generateSummary(String userEmail, Long id, String notes) {
+    User user = userRepository.findByEmail(userEmail)
+        .orElseThrow(() -> new NotFoundException("User not found"));
+    Report report = reportRepository.findByIdAndUser(id, user)
+        .orElseThrow(() -> new NotFoundException("Report not found"));
+    report.setStatus(ReportStatus.COMPLETED);
+    report.setSummary(generateSummary(report, notes));
+    reportRepository.save(report);
+    return getReport(userEmail, id);
+  }
+
+  private String generateSummary(Report report, String notes) {
     String date = report.getReportDate() == null ? "unspecified date" : report.getReportDate().toString();
-    return "Report '" + report.getName() + "' (" + report.getType() + ") reviewed on " + date
-        + ". Summary is auto-generated for demo purposes.";
+    StringBuilder summary = new StringBuilder();
+    summary.append("Report '")
+        .append(report.getName())
+        .append("' (")
+        .append(report.getType())
+        .append(") reviewed on ")
+        .append(date)
+        .append(". Summary is auto-generated for demo purposes.");
+    if (notes != null && !notes.isBlank()) {
+      summary.append(" Notes: ").append(notes.trim());
+    }
+    return summary.toString();
   }
 }

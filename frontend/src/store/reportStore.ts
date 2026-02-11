@@ -2,6 +2,7 @@ import { create } from "zustand";
 import {
   fetchReport,
   fetchReports,
+  generateReportSummary,
   updateReportStatus,
   uploadReport,
   ReportDetail,
@@ -16,6 +17,7 @@ type ReportState = {
   loadReports: () => Promise<void>;
   loadReport: (id: string) => Promise<void>;
   updateStatus: (id: string, status: string, summary?: string) => Promise<ReportDetail>;
+  generateSummary: (id: string, notes?: string) => Promise<ReportDetail>;
   upload: (formData: FormData) => Promise<void>;
 };
 
@@ -50,6 +52,17 @@ export const useReportStore = create<ReportState>((set) => ({
       return updated;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : "Failed to update report", loading: false });
+      throw error;
+    }
+  },
+  generateSummary: async (id: string, notes?: string) => {
+    set({ loading: true, error: null });
+    try {
+      const updated = await generateReportSummary(id, { notes });
+      set({ current: updated, loading: false });
+      return updated;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : "Failed to generate summary", loading: false });
       throw error;
     }
   },
